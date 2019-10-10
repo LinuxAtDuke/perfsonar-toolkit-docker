@@ -14,7 +14,7 @@ RUN yum -y install \
     iproute \
     bind-utils \
     tcpdump \
-    perfsonar-testpoint \
+    perfsonar-toolkit \
     && yum clean all \
     && rm -rf /var/cache/yum
 
@@ -34,13 +34,14 @@ ENV PGVERSION 95
 ENV PGDATA /var/lib/pgsql/9.5/data
 
 # Initialize the database
-RUN su - postgres -c "/usr/pgsql-9.5/bin/pg_ctl init"
+RUN rm -rf $PGDATA && mkdir $PGDATA && chown -R postgres:postgres $PGDATA && \
+su - postgres -c "/usr/pgsql-9.5/bin/pg_ctl init"
 
 # Overlay the configuration files
 COPY postgresql/postgresql.conf /var/lib/pgsql/$PG_VERSION/data/postgresql.conf
 COPY postgresql/pg_hba.conf /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
 
-# Change own user
+# Change owning user
 RUN chown -R postgres:postgres /var/lib/pgsql/$PG_VERSION/data/*
 
 # End PostgreSQL Setup
@@ -54,9 +55,8 @@ RUN chown -R postgres:postgres /var/lib/pgsql/$PG_VERSION/data/*
 # Initialize pscheduler database.  This needs to happen as one command
 # because each RUN happens in an interim container.
 
-COPY postgresql/pscheduler-build-database /tmp/pscheduler-build-database
-RUN  /tmp/pscheduler-build-database && \
-    rm -f /tmp/pscheduler-build-database
+COPY postgresql/perfSonar-build-database /tmp/perfSonar-build-database
+RUN /tmp/perfSonar-build-database && rm -f /tmp/pscheduler-build-database
 
 
 # -----------------------------------------------------------------------------
@@ -72,6 +72,12 @@ COPY rsyslog/owamp-syslog.conf /etc/rsyslog.d/owamp-syslog.conf
 
 # -----------------------------------------------------------------------------
 
+# Disable prompting about perfSonar sudo user
+RUN chmod -x /usr/lib/perfsonar/scripts/add_pssudo_user
+
+# Create directory for pScheduler pid files
+RUN mkdir -p /var/run/pscheduler-server
+
 RUN mkdir -p /var/log/supervisor 
 ADD supervisord.conf /etc/supervisord.conf
 
@@ -85,7 +91,11 @@ ADD supervisord.conf /etc/supervisord.conf
 # iperf3: 5201
 EXPOSE 443 861 862 5000-5001 5101 5201 8760-9960 18760-19960
 
-# add pid directory, logging, and postgres directory
-VOLUME ["/var/run", "/var/lib/pgsql", "/var/log", "/etc/rsyslog.d" ]
+# Add directories for PID files, logging,
+# httpd, PKI, postgresql, cassandra, and perfsonar state.
+VOLUME [ "/run", "/var/log", "/etc/rsyslog.d", \
+"/etc/httpd", "/etc/pki", \
+"/var/lib/pgsql", "/var/lib/cassandra", \
+"/etc/perfsonar", "/var/lib/perfsonar" ]
 
 CMD /usr/bin/supervisord -c /etc/supervisord.conf

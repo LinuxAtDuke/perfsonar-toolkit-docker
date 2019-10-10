@@ -49,6 +49,23 @@ echo "Database loaded"
 ) | postgresql-load
 echo "Password set"
 
+echo "Setting up esmond"
+su - postgres -c "psql -c \"CREATE USER esmond WITH PASSWORD 'changeit'\""
+su - postgres -c 'psql -c "CREATE DATABASE esmond"'
+su - postgres -c 'psql -c "GRANT ALL ON DATABASE esmond to esmond"'
+echo "esmond set up"
+
+# Set up esmond
+export ESMOND_ROOT=/usr/lib/esmond
+export ESMOND_CONF=/etc/esmond/esmond.conf
+(
+cd ${ESMOND_ROOT}
+. bin/activate
+python esmond/manage.py migrate --fake-initial
+deactivate
+)
+/usr/lib/perfsonar/scripts/system_environment/configure_esmond --force
+
 # Shut down
 su - postgres -c "/usr/pgsql-9.5/bin/pg_ctl stop  -w -t 60"
 echo "Server stopped"
