@@ -1,4 +1,4 @@
-# perfSONAR Testpoint
+# perfSONAR Toolkit
 
 FROM centos:centos7
 MAINTAINER perfSONAR <perfsonar-user@perfsonar.net>
@@ -14,6 +14,7 @@ RUN yum -y install \
     iproute \
     bind-utils \
     tcpdump \
+    less \
     perfsonar-toolkit \
     && yum clean all \
     && rm -rf /var/cache/yum
