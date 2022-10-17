@@ -5,7 +5,7 @@ MAINTAINER perfSONAR <perfsonar-user@perfsonar.net>
 
 RUN yum -y install \
     epel-release \
-    http://software.internet2.edu/rpms/el7/x86_64/latest/packages/perfSONAR-repo-0.9-1.noarch.rpm \
+    http://software.internet2.edu/rpms/el7/x86_64/latest/packages/perfSONAR-repo-0.10-1.noarch.rpm \
     && yum -y install \
     supervisor \
     rsyslog \
@@ -28,15 +28,15 @@ RUN yum -y install \
 # https://raw.githubusercontent.com/zokeber/docker-postgresql/master/Dockerfile
 
 # Postgresql version
-ENV PG_VERSION 9.5
-ENV PGVERSION 95
+ENV PG_VERSION 10
+ENV PGVERSION 10
 
 # Set the environment variables
-ENV PGDATA /var/lib/pgsql/9.5/data
+ENV PGDATA /var/lib/pgsql/10/data
 
 # Initialize the database
 RUN rm -rf $PGDATA && mkdir $PGDATA && chown -R postgres:postgres $PGDATA && \
-su - postgres -c "/usr/pgsql-9.5/bin/pg_ctl init"
+su - postgres -c "/usr/pgsql-10/bin/pg_ctl init"
 
 # Overlay the configuration files
 COPY postgresql/postgresql.conf /var/lib/pgsql/$PG_VERSION/data/postgresql.conf
@@ -76,8 +76,11 @@ COPY rsyslog/owamp-syslog.conf /etc/rsyslog.d/owamp-syslog.conf
 # Disable prompting about perfSonar sudo user
 RUN chmod -x /usr/lib/perfsonar/scripts/add_pssudo_user
 
-# Create directory for pScheduler pid files
-RUN mkdir -p /var/run/pscheduler-server
+# Create directories for pScheduler pid files
+RUN mkdir -p /var/run/pscheduler-server/scheduler \
+    && mkdir -p /var/run/pscheduler-server/runner \
+    && mkdir -p /var/run/pscheduler-server/archiver \
+    && mkdir -p /var/run/pscheduler-server/ticker
 
 RUN mkdir -p /var/log/supervisor 
 ADD supervisord.conf /etc/supervisord.conf
