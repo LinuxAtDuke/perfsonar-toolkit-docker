@@ -1,11 +1,7 @@
 Port 4022
-Protocol 2
-HostKey /srv/ssh/keys/ssh_host_rsa_key
-HostKey /srv/ssh/keys/ssh_host_ecdsa_key
-HostKey /srv/ssh/keys/ssh_host_ed25519_key
 
 AuthenticationMethods publickey
-AuthorizedKeysFile /srv/ssh/local/authorized_keys
+AuthorizedKeysFile /etc/ssh/local/authorized_keys
 PermitRootLogin prohibit-password
 AllowUsers root
 UsePAM no

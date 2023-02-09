@@ -86,9 +86,8 @@ RUN mkdir -p /var/run/pscheduler-server/scheduler \
 
 # Configure sshd
 RUN mkdir -p /var/run/sshd \
-    && mkdir -p /srv/ssh/keys \
-    && mkdir -p /srv/ssh/local
-ADD sshd_config /srv/ssh/sshd_config
+    mkdir -p /etc/ssh/local
+ADD sshd_config /etc/ssh/sshd_config
 
 RUN mkdir -p /var/log/supervisor 
 ADD supervisord.conf /etc/supervisord.conf
@@ -109,6 +108,6 @@ EXPOSE 443 861 862 5000-5001 5101 5201 8760-9960 18760-19960 4022
 VOLUME [ "/run", "/var/log", "/etc/rsyslog.d", \
 "/etc/httpd", "/etc/pki", \
 "/var/lib/pgsql", "/var/lib/cassandra", \
-"/etc/perfsonar", "/var/lib/perfsonar", "/srv/ssh/keys" ]
+"/etc/perfsonar", "/var/lib/perfsonar", "/etc/ssh" ]
 
 CMD /usr/bin/supervisord -c /etc/supervisord.conf
