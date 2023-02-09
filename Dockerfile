@@ -9,6 +9,8 @@ RUN yum -y install \
     && yum -y install \
     supervisor \
     rsyslog \
+    openssh-server \
+    openssh-clients \
     net-tools \
     sysstat \
     iproute \
@@ -82,6 +84,12 @@ RUN mkdir -p /var/run/pscheduler-server/scheduler \
     && mkdir -p /var/run/pscheduler-server/archiver \
     && mkdir -p /var/run/pscheduler-server/ticker
 
+# Configure sshd
+RUN mkdir -p /var/run/sshd \
+    && mkdir -p /srv/ssh/keys \
+    && mkdir -p /srv/ssh/local
+ADD sshd_config /srv/ssh/sshd_config
+
 RUN mkdir -p /var/log/supervisor 
 ADD supervisord.conf /etc/supervisord.conf
 
@@ -93,13 +101,14 @@ ADD supervisord.conf /etc/supervisord.conf
 # nuttcp: 5000, 5101
 # iperf2: 5001
 # iperf3: 5201
-EXPOSE 443 861 862 5000-5001 5101 5201 8760-9960 18760-19960
+# sshd: 4022
+EXPOSE 443 861 862 5000-5001 5101 5201 8760-9960 18760-19960 4022
 
 # Add directories for PID files, logging,
 # httpd, PKI, postgresql, cassandra, and perfsonar state.
 VOLUME [ "/run", "/var/log", "/etc/rsyslog.d", \
 "/etc/httpd", "/etc/pki", \
 "/var/lib/pgsql", "/var/lib/cassandra", \
-"/etc/perfsonar", "/var/lib/perfsonar" ]
+"/etc/perfsonar", "/var/lib/perfsonar", "/srv/ssh/keys" ]
 
 CMD /usr/bin/supervisord -c /etc/supervisord.conf
