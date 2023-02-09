@@ -88,6 +88,7 @@ RUN mkdir -p /var/run/pscheduler-server/scheduler \
 RUN mkdir -p /var/run/sshd \
     mkdir -p /etc/ssh/local
 ADD sshd_config /etc/ssh/sshd_config
+ADD sshd_exec /usr/sbin/sshd_exec
 
 RUN mkdir -p /var/log/supervisor 
 ADD supervisord.conf /etc/supervisord.conf
