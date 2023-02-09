@@ -14,5 +14,3 @@ X11Forwarding no
 
 AcceptEnv LANG LC_*
 Subsystem	sftp	/usr/lib/openssh/sftp-server
-
-Include /srv/ssh/local/*.conf
