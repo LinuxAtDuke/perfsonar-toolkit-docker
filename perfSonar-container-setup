@@ -1,5 +1,8 @@
 #!/bin/sh -e
 
+# Wait for postgres to be alive...
+until /usr/pgsql-10/bin/pg_isready -U postgres; do sleep 1; done
+
 # Set the password in the pScheduler database to match what's on the
 # disk.
 ( \
@@ -8,5 +11,8 @@
     && printf "';\n" \
 ) | postgresql-load
 echo "Password set"
+
+# Finally, start the perfSonar show.
+/usr/bin/supervisorctl start perfsonar:*
 
 exit 0

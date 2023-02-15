@@ -47,10 +47,6 @@ COPY postgresql/pg_hba.conf /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
 # Change owning user
 RUN chown -R postgres:postgres /var/lib/pgsql/$PG_VERSION/data/*
 
-# Add post-container-start configuration utility
-# Right now, it just updates the password at container start.
-COPY postgresql/container-pgsql-boot-setup /usr/bin/container-pgsql-boot-setup
-
 # End PostgreSQL Setup
 
 
@@ -96,6 +92,9 @@ ADD sshd_exec /usr/sbin/sshd_exec
 
 RUN mkdir -p /var/log/supervisor 
 ADD supervisord.conf /etc/supervisord.conf
+
+# Add post-container-start configuration utility
+COPY perfSonar-container-setup /usr/bin/perfSonar-container-setup
 
 # The following ports are used:
 # pScheduler: 443
