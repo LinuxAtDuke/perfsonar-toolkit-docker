@@ -44,6 +44,9 @@ su - postgres -c "/usr/pgsql-10/bin/pg_ctl init"
 COPY postgresql/postgresql.conf /var/lib/pgsql/$PG_VERSION/data/postgresql.conf
 COPY postgresql/pg_hba.conf /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
 
+# Add post-container-start configuration utility
+COPY postgresql/container-pgsql-boot-setup /usr/bin/container-pgsql-boot-setup
+
 # Change owning user
 RUN chown -R postgres:postgres /var/lib/pgsql/$PG_VERSION/data/*
 
