@@ -45,6 +45,7 @@ COPY postgresql/postgresql.conf /var/lib/pgsql/$PG_VERSION/data/postgresql.conf
 COPY postgresql/pg_hba.conf /var/lib/pgsql/$PG_VERSION/data/pg_hba.conf
 
 # Add post-container-start configuration utility
+# Right now, it just updates the password at container start.
 COPY postgresql/container-pgsql-boot-setup /usr/bin/container-pgsql-boot-setup
 
 # Change owning user
