@@ -5,8 +5,13 @@ MAINTAINER perfSONAR <perfsonar-user@perfsonar.net>
 
 RUN yum -y install \
     epel-release \
-    http://software.internet2.edu/rpms/el7/x86_64/latest/packages/perfSONAR-repo-0.10-1.noarch.rpm \
-    && yum -y install \
+    http://software.internet2.edu/rpms/el7/x86_64/4.4.6/packages/perfSONAR-repo-0.10-1.noarch.rpm
+
+# Overlay Internet2's repo file, since it only works
+# with the latest release (and not older ones).
+COPY current_supported_version.repo /etc/yum.repos.d/perfSONAR.repo
+
+RUN yum -y install \
     supervisor \
     rsyslog \
     openssh-server \
